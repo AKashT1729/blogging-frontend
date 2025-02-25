@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext();
 
@@ -6,18 +6,26 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem('admin');
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
-  const login = () => {
-    const fakeUser = { id: 1, name: "Admin", email: "admin@example.com" };
-    localStorage.setItem("user", JSON.stringify(fakeUser));
-    setUser(fakeUser);
+  const login = (password) => {
+    if (password === 'admin123') { // Hardcoded demo password
+      const adminUser = { 
+        id: 1, 
+        name: 'Admin',
+        isAdmin: true
+      };
+      localStorage.setItem('admin', JSON.stringify(adminUser));
+      setUser(adminUser);
+      return true;
+    }
+    return false;
   };
 
   const logout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem('admin');
     setUser(null);
   };
 

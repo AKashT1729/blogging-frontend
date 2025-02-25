@@ -11,7 +11,6 @@ const Home = () => {
   const page = parseInt(searchParams.get('page')) || 1;
   const itemsPerPage = 6;
   const searchTerm = searchParams.get('search') || '';
-  const category = searchParams.get('category') || 'all';
 
   useEffect(() => {
     const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
@@ -20,10 +19,8 @@ const Home = () => {
   }, []);
 
   const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    return post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = category === 'all' || post.category === category;
-    return matchesSearch && matchesCategory;
   });
 
   const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
@@ -44,22 +41,6 @@ const Home = () => {
           }
           className="p-2 border rounded w-full md:w-64"
         />
-
-        <select
-          value={category}
-          onChange={(e) =>
-            setSearchParams({
-              ...Object.fromEntries(searchParams),
-              category: e.target.value,
-            })
-          }
-          className="p-2 border rounded"
-        >
-          <option value="all">All Categories</option>
-          <option value="technology">Technology</option>
-          <option value="design">Design</option>
-          <option value="development">Development</option>
-        </select>
       </div>
 
       {loading ? (
