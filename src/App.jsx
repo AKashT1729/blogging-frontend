@@ -2,20 +2,32 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import CreatePost from "./pages/CreatePost";
+
 import SinglePost from "./pages/SinglePost";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
+import PostEditor from "./pages/PostEditor";
 
 function App() {
   return (
     <>
+      <AuthProvider>
       <Router>
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/create" element={<CreatePost />} />
           <Route path="/post/:id" element={<SinglePost />} />
+          <Route
+            path="/create"
+            element={<ProtectedRoute><PostEditor /></ProtectedRoute>}
+          />
+          <Route
+            path="/edit/:id"
+            element={<ProtectedRoute><PostEditor /></ProtectedRoute>}
+          />
         </Routes>
       </Router>
+    </AuthProvider>
     </>
   );
 }

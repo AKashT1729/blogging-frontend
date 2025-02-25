@@ -1,20 +1,20 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
 import {
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../context/AuthContext";
+
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout ,login} = useAuth();
   return (
     <>
       <nav className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="text-2xl font-bold text-gray-800">
-              My Blog
+              BlogCMS
             </Link>
             <div className="flex items-center gap-4">
               {user ? (
