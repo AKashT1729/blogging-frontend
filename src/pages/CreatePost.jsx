@@ -2,28 +2,28 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
-    const [title, setTitle] = useState('')
-    const [content, setContent] = useState('')
-    const [image, setImage] = useState('')
-    const navigate = useNavigate()
-  
-    const handleSubmit = (e) => {
-      e.preventDefault()
-      
-      const newPost = {
-        id: Date.now(),
-        title,
-        content,
-        image,
-        date: new Date().toISOString()
-      }
-  
-      const existingPosts = JSON.parse(localStorage.getItem('posts')) || []
-      const updatedPosts = [newPost, ...existingPosts]
-      
-      localStorage.setItem('posts', JSON.stringify(updatedPosts))
-      navigate('/')
-    }
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [image, setImage] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const newPost = {
+      id: Date.now(),
+      title,
+      content,
+      image,
+      date: new Date().toISOString(),
+    };
+
+    const existingPosts = JSON.parse(localStorage.getItem("posts")) || [];
+    const updatedPosts = [newPost, ...existingPosts];
+
+    localStorage.setItem("posts", JSON.stringify(updatedPosts));
+    navigate("/");
+  };
 
   return (
     <>

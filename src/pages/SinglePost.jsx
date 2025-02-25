@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const SinglePost = () => {
-    const { id } = useParams()
-  const [post, setPost] = useState(null)
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
 
   useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem('posts')) || []
-    const foundPost = savedPosts.find(p => p.id === Number(id))
-    setPost(foundPost)
-  }, [id])
+    const savedPosts = JSON.parse(localStorage.getItem("posts")) || [];
+    const foundPost = savedPosts.find((p) => p.id === Number(id));
+    setPost(foundPost);
+  }, [id]);
 
-  if (!post) return <div className="text-center py-8">Post not found</div>
+  if (!post) return <div className="text-center py-8">Post not found</div>;
 
   return (
     <>
