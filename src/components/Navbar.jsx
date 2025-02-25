@@ -1,10 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+
 import {
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
+import { useAuth } from "../context/AuthContext";
 const Navbar = () => {
   const { user, logout } = useAuth();
   return (
