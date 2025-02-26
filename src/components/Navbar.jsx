@@ -31,7 +31,7 @@ const Navbar = () => {
                 <span className="text-gray-600">{user.name}</span>
                 <button 
                   onClick={logout}
-                  className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
+                  className="flex items-center gap-1 text-gray-600 hover:text-gray-900 cursor-pointer"
                 >
                   Logout <ArrowRightOnRectangleIcon className="h-4 w-4" />
                 </button>
