@@ -12,32 +12,33 @@ export default function CommentSection({ postId }) {
   });
   const { user } = useAuth();
 
-  // Load saved guest details
+  // Load comments and user details
   useEffect(() => {
+    // Load comments
+    const storedComments = JSON.parse(localStorage.getItem('comments')) || [];
+    const postComments = storedComments.filter(c => c.postId === Number(postId));
+    setComments(postComments);
+
+    // Load saved guest details
     const savedDetails = localStorage.getItem('commentAuthorDetails');
     if (savedDetails) {
       setAuthorDetails(JSON.parse(savedDetails));
     }
-  }, []);
-
-  // Save guest details when checkbox changes
-  useEffect(() => {
-    if (authorDetails.rememberMe) {
-      localStorage.setItem('commentAuthorDetails', JSON.stringify(authorDetails));
-    }
-  }, [authorDetails.rememberMe]);
+  }, [postId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    // Validation for guests
     if (!user?.isAdmin && (!authorDetails.name || !authorDetails.email)) {
       alert('Please fill in required fields');
       return;
     }
 
+    // Create comment object
     const comment = {
       id: Date.now(),
-      postId,
+      postId: Number(postId),
       author: user?.isAdmin ? 'Admin' : authorDetails.name,
       email: user?.isAdmin ? null : authorDetails.email,
       content: newComment,
@@ -46,28 +47,17 @@ export default function CommentSection({ postId }) {
       parentId: replyingTo
     };
 
-    if (replyingTo) {
-      const updatedComments = comments.map(comment => {
-        if (comment.id === replyingTo) {
-          return {
-            ...comment,
-            replies: [...comment.replies, comment]
-          };
-        }
-        return comment;
-      });
-      setComments(updatedComments);
-      localStorage.setItem('comments', JSON.stringify(updatedComments));
-    } else {
-      const updatedComments = [...comments, comment];
-      setComments(updatedComments);
-      localStorage.setItem('comments', JSON.stringify(updatedComments));
-    }
+    // Update comments
+    const updatedComments = [...comments, comment];
+    setComments(updatedComments);
+    localStorage.setItem('comments', JSON.stringify(updatedComments));
 
+    // Reset form
     setNewComment('');
     setReplyingTo(null);
     
-    if (!authorDetails.rememberMe) {
+    // Clear guest details if not saving
+    if (!authorDetails.rememberMe && !user?.isAdmin) {
       setAuthorDetails(prev => ({
         ...prev,
         email: ''
@@ -88,6 +78,7 @@ export default function CommentSection({ postId }) {
     <div className="mt-12">
       <h3 className="text-xl font-bold mb-4">Comments ({comments.length})</h3>
 
+      {/* Comment form for guests */}
       {!user?.isAdmin && (
         <form className="mb-8 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -119,6 +110,7 @@ export default function CommentSection({ postId }) {
         </form>
       )}
 
+      {/* Comment input */}
       <form onSubmit={handleSubmit} className="mb-8">
         <textarea
           value={newComment}
@@ -131,7 +123,7 @@ export default function CommentSection({ postId }) {
         <div className="flex justify-between items-center mt-2">
           <button
             type="submit"
-            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700"
+            className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 cursor-pointer"
           >
             {replyingTo ? 'Post Reply' : 'Post Comment'}
           </button>
@@ -139,7 +131,7 @@ export default function CommentSection({ postId }) {
             <button
               type="button"
               onClick={() => setReplyingTo(null)}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-gray-600 hover:text-gray-800 cursor-pointer"
             >
               Cancel Reply
             </button>
@@ -147,36 +139,49 @@ export default function CommentSection({ postId }) {
         </div>
       </form>
 
+      {/* Comments list */}
       <div className="space-y-4">
         {comments.map(comment => (
           <div key={comment.id} className="border p-4 rounded-lg relative">
+            {/* Admin delete button */}
             {user?.isAdmin && (
               <button
                 onClick={() => handleDelete(comment.id)}
-                className="absolute top-2 right-2 text-red-600 hover:text-red-800"
+                className="absolute top-2 right-2 text-red-600 hover:text-red-800 cursor-pointer"
               >
                 Delete
               </button>
             )}
             
+            {/* Comment header */}
             <div className="flex items-center gap-2 mb-2">
-              <span className="font-semibold">{comment.author}</span>
+              <span className="font-semibold">
+                {comment.author}
+                {comment.author === 'Admin' && (
+                  <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                    Admin
+                  </span>
+                )}
+              </span>
               <span className="text-sm text-gray-500">
                 {new Date(comment.date).toLocaleDateString()}
               </span>
             </div>
             
+            {/* Comment content */}
             <p className="text-gray-800">{comment.content}</p>
 
+            {/* Reply button for admin */}
             {user?.isAdmin && (
               <button
                 onClick={() => setReplyingTo(comment.id)}
-                className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+                className="mt-2 text-sm text-blue-600 hover:text-blue-800 cursor-pointer"
               >
                 Reply as Admin
               </button>
             )}
 
+            {/* Replies */}
             {comment.replies.length > 0 && (
               <div className="ml-8 mt-4 space-y-4 border-l-2 pl-4">
                 {comment.replies.map(reply => (
@@ -189,7 +194,7 @@ export default function CommentSection({ postId }) {
                       {user?.isAdmin && (
                         <button
                           onClick={() => handleDelete(reply.id)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-600 hover:text-red-800 cursor-pointer"
                         >
                           Delete
                         </button>
