@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PostCard from '../components/PostCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import usePageTitle from '../hooks/usePageTitle';
 
 const Home = () => {
+  usePageTitle('Home');
   const [posts, setPosts] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);

@@ -1,8 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from 'react';
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-
 import SinglePost from "./pages/SinglePost";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -14,6 +14,7 @@ function App() {
     <>
       <AuthProvider>
         <Router>
+          <LocationHandler />
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -40,6 +41,18 @@ function App() {
       </AuthProvider>
     </>
   );
+}
+
+function LocationHandler() {
+  const location = useLocation();
+  
+  useEffect(() => {
+    if (location.pathname === '/') {
+      document.title = "ADT News";
+    }
+  }, [location]);
+
+  return null;
 }
 
 export default App;

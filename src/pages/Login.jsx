@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import usePageTitle from "../hooks/usePageTitle";
 
 const Login = () => {
   const [password, setPassword] = useState("");
@@ -9,6 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  usePageTitle("Admin Login");
   const handleSubmit = async (e) => {
     e.preventDefault();
     const success = login(password);

@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useAuth } from '../context/AuthContext';
-import CommentSection from '../components/CommentSection';
-import toast from 'react-hot-toast';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { useAuth } from "../context/AuthContext";
+import CommentSection from "../components/CommentSection";
+import toast from "react-hot-toast";
+import usePageTitle from "../hooks/usePageTitle";
 
 const SinglePost = () => {
   const { id } = useParams();
@@ -14,19 +15,25 @@ const SinglePost = () => {
   const { user } = useAuth();
   const [post, setPost] = useState(null);
 
+  usePageTitle(post?.title);
+
   useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
-    const foundPost = savedPosts.find(p => p.id === Number(id));
+    const savedPosts = JSON.parse(localStorage.getItem("posts")) || [];
+    const foundPost = savedPosts.find((p) => p.id === Number(id));
     setPost(foundPost);
   }, [id]);
 
   const handleDelete = () => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this post?"
+    );
     if (confirmDelete) {
-      const updatedPosts = JSON.parse(localStorage.getItem('posts')).filter(p => p.id !== Number(id));
-      localStorage.setItem('posts', JSON.stringify(updatedPosts));
-      navigate('/');
-      toast.success('Post deleted successfully');
+      const updatedPosts = JSON.parse(localStorage.getItem("posts")).filter(
+        (p) => p.id !== Number(id)
+      );
+      localStorage.setItem("posts", JSON.stringify(updatedPosts));
+      navigate("/");
+      toast.success("Post deleted successfully");
     }
   };
 
@@ -51,10 +58,10 @@ const SinglePost = () => {
           remarkPlugins={[remarkGfm]}
           components={{
             code({ node, inline, className, children, ...props }) {
-              const match = /language-(\w+)/.exec(className || '');
+              const match = /language-(\w+)/.exec(className || "");
               return !inline && match ? (
                 <SyntaxHighlighter
-                  children={String(children).replace(/\n$/, '')}
+                  children={String(children).replace(/\n$/, "")}
                   style={atomDark}
                   language={match[1]}
                   PreTag="div"
@@ -65,7 +72,7 @@ const SinglePost = () => {
                   {children}
                 </code>
               );
-            }
+            },
           }}
         />
       </article>
