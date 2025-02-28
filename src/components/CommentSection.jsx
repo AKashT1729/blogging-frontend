@@ -26,6 +26,13 @@ export default function CommentSection({ postId }) {
     }
   }, [postId]);
 
+  // Save guest details when checkbox changes
+  useEffect(() => {
+    if (authorDetails.rememberMe) {
+      localStorage.setItem('commentAuthorDetails', JSON.stringify(authorDetails));
+    }
+  }, [authorDetails.rememberMe]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -47,10 +54,23 @@ export default function CommentSection({ postId }) {
       parentId: replyingTo
     };
 
-    // Update comments
-    const updatedComments = [...comments, comment];
-    setComments(updatedComments);
-    localStorage.setItem('comments', JSON.stringify(updatedComments));
+    if (replyingTo) {
+      const updatedComments = comments.map(comment => {
+        if (comment.id === replyingTo) {
+          return {
+            ...comment,
+            replies: [...comment.replies, comment]
+          };
+        }
+        return comment;
+      });
+      setComments(updatedComments);
+      localStorage.setItem('comments', JSON.stringify(updatedComments));
+    } else {
+      const updatedComments = [...comments, comment];
+      setComments(updatedComments);
+      localStorage.setItem('comments', JSON.stringify(updatedComments));
+    }
 
     // Reset form
     setNewComment('');
