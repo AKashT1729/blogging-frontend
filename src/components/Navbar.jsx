@@ -14,13 +14,13 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-bold text-gray-800">
-            Admin Blog
+            ADT News
           </Link>
           <div className="flex items-center gap-4">
             {user?.isAdmin && (
               <Link 
                 to="/create" 
-                className="text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-900"
               >
                 Create Post
               </Link>
@@ -31,15 +31,15 @@ const Navbar = () => {
                 <span className="text-gray-600">{user.name}</span>
                 <button 
                   onClick={logout}
-                  className="flex items-center gap-1 text-gray-600 hover:text-gray-900 cursor-pointer"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-900 cursor-pointer"
                 >
-                  Logout <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                  Logout <ArrowRightOnRectangleIcon className="h-4 w-4 ml-1" />
                 </button>
               </div>
             ) : (
               <Link 
                 to="/login" 
-                className="text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 hover:text-gray-900"
               >
                 Admin Login
               </Link>
