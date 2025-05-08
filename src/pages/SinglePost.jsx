@@ -8,35 +8,50 @@ import { useAuth } from "../context/AuthContext";
 import CommentSection from "../components/CommentSection";
 import toast from "react-hot-toast";
 import usePageTitle from "../hooks/usePageTitle";
+import axios from "axios";
 
 const SinglePost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   usePageTitle(post?.title);
 
   useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem("posts")) || [];
-    const foundPost = savedPosts.find((p) => p.id === Number(id));
-    setPost(foundPost);
+    const fetchPost = async () => {
+      try {
+        const response = await axios.get(`/api/v1/blogs/${id}`);
+        setPost(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching post:", error);
+        toast.error("Failed to load the post.");
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
   }, [id]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this post?"
     );
     if (confirmDelete) {
-      const updatedPosts = JSON.parse(localStorage.getItem("posts")).filter(
-        (p) => p.id !== Number(id)
-      );
-      localStorage.setItem("posts", JSON.stringify(updatedPosts));
-      navigate("/");
-      toast.success("Post deleted successfully");
+      try {
+        await axios.delete(`/api/v1/blogs/${id}`);
+        toast.success("Post deleted successfully");
+        navigate("/");
+      } catch (error) {
+        console.error("Error deleting post:", error);
+        toast.error("Failed to delete the post.");
+      }
     }
   };
 
+  if (loading) return <div className="text-center py-8">Loading...</div>;
   if (!post) return <div className="text-center py-8">Post not found</div>;
 
   return (
@@ -51,7 +66,7 @@ const SinglePost = () => {
           />
         )}
         <p className="text-gray-600 mb-4">
-          Posted on {new Date(post.date).toLocaleDateString()}
+          Posted on {new Date(post.createdAt).toLocaleDateString()}
         </p>
         {post.applyUrl && (
           <p className="mb-4">
@@ -88,10 +103,10 @@ const SinglePost = () => {
           }}
         />
       </article>
-      {user && (
+      {user?.isAdmin && (
         <div className="mt-8 flex gap-4">
           <button
-            onClick={() => navigate(`/edit/${post.id}`)}
+            onClick={() => navigate(`/edit/${post._id}`)}
             className="bg-blue-600 text-white px-4 py-2 rounded"
           >
             Edit Post
@@ -104,7 +119,7 @@ const SinglePost = () => {
           </button>
         </div>
       )}
-      <CommentSection postId={post.id} />
+      <CommentSection postId={post._id} />
     </div>
   );
 };
