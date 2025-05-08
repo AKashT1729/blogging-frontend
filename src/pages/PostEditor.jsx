@@ -6,6 +6,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import toast from "react-hot-toast";
 import usePageTitle from "../hooks/usePageTitle";
+import axios from "axios";
 
 const PostEditor = () => {
   const { id } = useParams();
@@ -17,37 +18,41 @@ const PostEditor = () => {
   const [post, setPost] = useState({
     title: "",
     content: "",
-    image: "",
-    category: "general",
-    tags: "",
+    blogImageUrl: "",
+    applyUrl: "", // New field for apply URL
+    isPublished: false,
   });
 
   useEffect(() => {
     if (isEditing) {
-      const existingPosts = JSON.parse(localStorage.getItem("posts")) || [];
-      const foundPost = existingPosts.find((p) => p.id === Number(id));
-      if (foundPost) setPost(foundPost);
+      axios
+        .get(`/api/v1/blogs/${id}`)
+        .then((response) => {
+          setPost(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching blog post:", error);
+          toast.error("Failed to load the post.");
+        });
     }
   }, [id, isEditing]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newPost = {
-      ...post,
-      id: isEditing ? post.id : Date.now(),
-      date: new Date().toISOString(),
-      tags: post.tags.split(",").map((tag) => tag.trim()),
-    };
-
-    const existingPosts = JSON.parse(localStorage.getItem("posts")) || [];
-    let updatedPosts = isEditing
-      ? existingPosts.map((p) => (p.id === newPost.id ? newPost : p))
-      : [newPost, ...existingPosts];
-
-    localStorage.setItem("posts", JSON.stringify(updatedPosts));
-    toast.success(`Post ${isEditing ? "Updated" : "Published"}!`);
-    navigate(isEditing ? `/post/${id}` : "/");
+    try {
+      if (isEditing) {
+        await axios.put(`/api/v1/blogs/${id}`, post);
+        toast.success("Post updated successfully!");
+      } else {
+        await axios.post("/api/v1/blogs", post);
+        toast.success("Post created successfully!");
+      }
+      navigate("/");
+    } catch (error) {
+      console.error("Error saving post:", error);
+      toast.error("Failed to save the post.");
+    }
   };
 
   return (
@@ -83,37 +88,38 @@ const PostEditor = () => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Image URL (optional)
+            Blog Image URL
           </label>
           <input
             type="url"
-            value={post.image}
-            onChange={(e) => setPost({ ...post, image: e.target.value })}
+            value={post.blogImageUrl}
+            onChange={(e) => setPost({ ...post, blogImageUrl: e.target.value })}
+            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Apply URL (optional)
+          </label>
+          <input
+            type="url"
+            value={post.applyUrl}
+            onChange={(e) => setPost({ ...post, applyUrl: e.target.value })}
             className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category
+            Publish
           </label>
           <input
-            type="text"
-            value={post.category}
-            onChange={(e) => setPost({ ...post, category: e.target.value })}
-            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tags (comma separated)
-          </label>
-          <input
-            type="text"
-            value={post.tags}
-            onChange={(e) => setPost({ ...post, tags: e.target.value })}
-            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            type="checkbox"
+            checked={post.isPublished}
+            onChange={(e) => setPost({ ...post, isPublished: e.target.checked })}
+            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
           />
         </div>
 
