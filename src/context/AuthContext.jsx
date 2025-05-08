@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 const AuthContext = createContext();
 
@@ -10,27 +11,25 @@ export function AuthProvider({ children }) {
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
-  const login = (emailOrUsername, password) => {
-    // Hardcoded demo credentials
-    const validCredentials = {
-      email: "admin@example.com",
-      username: "admin",
-      password: "admin123",
-    };
+  const login = async (emailOrUsername, password) => {
+    try {
+      const response = await axios.post("/api/v1/admin/login", {
+        emailOrUsername,
+        password,
+      });
 
-    if (
-      (emailOrUsername === validCredentials.email ||
-        emailOrUsername === validCredentials.username) &&
-      password === validCredentials.password
-    ) {
-      const adminUser = {
-        id: 1,
-        name: "Admin",
-        isAdmin: true,
-      };
-      localStorage.setItem("admin", JSON.stringify(adminUser));
-      setUser(adminUser);
-      return true;
+      if (response.data.success) {
+        const adminUser = {
+          id: response.data.user.id,
+          name: response.data.user.name,
+          isAdmin: true,
+        };
+        localStorage.setItem("admin", JSON.stringify(adminUser));
+        setUser(adminUser);
+        return true;
+      }
+    } catch (error) {
+      console.error("Login failed:", error.response?.data?.message || error.message);
     }
     return false;
   };

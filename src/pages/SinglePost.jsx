@@ -43,9 +43,9 @@ const SinglePost = () => {
     <div className="max-w-3xl mx-auto px-4 py-8">
       <article className="prose lg:prose-xl">
         <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-        {post.image && (
+        {post.blogImageUrl && (
           <img
-            src={post.image}
+            src={post.blogImageUrl}
             alt={post.title}
             className="w-full h-64 object-cover mb-8 rounded-lg"
           />
@@ -53,6 +53,18 @@ const SinglePost = () => {
         <p className="text-gray-600 mb-4">
           Posted on {new Date(post.date).toLocaleDateString()}
         </p>
+        {post.applyUrl && (
+          <p className="mb-4">
+            <a
+              href={post.applyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Apply Here
+            </a>
+          </p>
+        )}
         <ReactMarkdown
           children={post.content}
           remarkPlugins={[remarkGfm]}
